@@ -4,8 +4,7 @@
 #include <vector>
 #include <thread>
 #include <mutex>
-#include <unordered_map>
-
+#include <map>
 
 class device_manager;
 class uinput;
@@ -45,7 +44,7 @@ private:
   void pass_along_device(struct udev_device* new_dev);
   std::mutex manager_lock;
   std::mutex grabbed_nodes_lock;
-  std::unordered_map<std::string,grabbed_node> grabbed_nodes;
+  std::map<std::string,grabbed_node> grabbed_nodes;
 };
 
 

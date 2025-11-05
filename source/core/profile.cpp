@@ -509,8 +509,8 @@ void profile::build_default_gamepad_profile() {
     (*map)["tr2_axis_btn"] = {nullptr, DEV_KEY, 1, nullptr};
 
     //For devices with the dpad as a hat.
-    (*map)["updown"] =   {new axis2btns(BTN_DPAD_UP,BTN_DPAD_DOWN), DEV_AXIS, 1, nullptr};
-    (*map)["leftright"] =   {new axis2btns(BTN_DPAD_LEFT,BTN_DPAD_RIGHT), DEV_AXIS, 1, nullptr};
+    (*map)["updown"] =   {new axis2btns(BTN_DPAD_UP,BTN_DPAD_DOWN, nullptr), DEV_AXIS, 1, nullptr};
+    (*map)["leftright"] =   {new axis2btns(BTN_DPAD_LEFT,BTN_DPAD_RIGHT, nullptr), DEV_AXIS, 1, nullptr};
 
     //for backwards compatability
     default_gamepad_profile.aliases["primary"] = "first";

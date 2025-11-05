@@ -15,6 +15,9 @@
 
 struct mg_ev {
   int64_t value;
+  __u16 override_type;
+  __u16 override_code;
+  int override_value;
 };
 
 class input_source;

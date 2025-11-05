@@ -741,7 +741,7 @@ event_translator* MGparser::parse_special_trans(enum entry_type intype, complex_
   if ((intype == DEV_AXIS) && expr->ident.empty() && expr->params.size() == 2) {
     int neg_btn = read_ev_code(expr->params[0]->ident, OUT_KEY);
     int pos_btn = read_ev_code(expr->params[1]->ident, OUT_KEY);
-    if (neg_btn >= 0 && pos_btn >= 0) return new axis2btns(neg_btn, pos_btn);
+    if (neg_btn >= 0 && pos_btn >= 0) return new axis2btns(neg_btn, pos_btn, mg->slots->keyboard.virt_dev.get());
   }
 
   return nullptr;

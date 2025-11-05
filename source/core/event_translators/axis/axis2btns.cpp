@@ -3,12 +3,15 @@
 
 void axis2btns::process(struct mg_ev ev, virtual_device* out) {
   struct input_event out_ev;
+  
   memset(&out_ev, 0, sizeof(out_ev));
   out_ev.type = EV_KEY;
+
   out_ev.code = neg_btn;
   out_ev.value = ev.value < -.5 * ABS_RANGE;
   if (out_ev.value != neg_cache) {
-    write_out(out_ev, out);
+    virtual_device* out_dev = neg_btn < 1000 ? virt_keyboard : out;
+    write_out(out_ev, out_dev);
     neg_cache = out_ev.value;
   }
 
@@ -16,7 +19,8 @@ void axis2btns::process(struct mg_ev ev, virtual_device* out) {
   out_ev.code = pos_btn;
   out_ev.value = ev.value > .5 * ABS_RANGE;
   if (out_ev.value != pos_cache) {
-    write_out(out_ev, out);
+    virtual_device* out_dev = pos_btn < 1000 ? virt_keyboard : out;
+    write_out(out_ev, out_dev);
     pos_cache = out_ev.value;
   }
 
