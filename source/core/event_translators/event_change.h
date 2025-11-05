@@ -40,6 +40,14 @@ public:
   virtual void process_recurring(virtual_device* out) const {
   }
 
+  void flush(virtual_device* out) const {
+    struct input_event flush_ev;
+    flush_ev.type = EV_SYN;
+    flush_ev.code = SYN_REPORT;
+    flush_ev.value = 0;
+    write_out(flush_ev, out);
+  }
+
   void write_out(struct input_event ev, virtual_device* out) const {
     out->take_event(ev);
   }

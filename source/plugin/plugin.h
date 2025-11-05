@@ -3,7 +3,7 @@
 #include <linux/input.h>
 #include "plugin_constants.h"
 
-#define ABS_RANGE 32768
+
 class input_source;
 class device_manager;
 class event_translator;

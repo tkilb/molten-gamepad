@@ -1,5 +1,6 @@
 
 #include "parser.h"
+#include "event_translators/axis/pedal2btn.h"
 #include "event_translators/event_change.h"
 #include "event_translators/translators.h"
 #include <cmath>
@@ -296,6 +297,7 @@ void MGparser::load_translators(moltengamepad* mg) {
   MAKE_GEN(axis2btns);
   MAKE_GEN(btn2rel);
   MAKE_GEN(axis2rel);
+  MAKE_GEN(pedal2btn);
   RENAME_GEN(redirect,redirect_trans);
   RENAME_GEN(multi,multitrans);
   //add a quick mouse redirect
@@ -736,6 +738,16 @@ event_translator* MGparser::parse_special_trans(enum entry_type intype, complex_
     }
   }
 
+
+  //Pedal to button. 
+  std::cout << "expr->ident" << "||" << expr->ident << "||" << std::endl;
+  std::cout << "expr->name" << "||" << expr->name << "||" << std::endl;
+  std::cout << "expr->params" << "||"<< expr->params[0]->ident << "||" << std::endl;
+
+  if ((intype == DEV_AXIS) && expr->ident == PEDAL_2_BTN && expr->params.size() == 1) {
+    int btn = read_ev_code(expr->params[0]->ident, OUT_KEY);
+    return new pedal2btn(btn, mg->slots->keyboard.virt_dev.get());
+  }
 
   //Axis to buttons.
   if ((intype == DEV_AXIS) && expr->ident.empty() && expr->params.size() == 2) {

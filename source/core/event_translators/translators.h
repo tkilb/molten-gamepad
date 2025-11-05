@@ -4,6 +4,7 @@
 #include "button/btn2axis.h"
 #include "button/btn2rel.h"
 
+#include "axis/pedal2btn.h"
 #include "axis/axis2axis.h"
 #include "axis/axis2btns.h"
 #include "axis/axis2rel.h"
