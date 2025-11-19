@@ -298,6 +298,7 @@ void MGparser::load_translators(moltengamepad* mg) {
   MAKE_GEN(btn2rel);
   MAKE_GEN(axis2rel);
   MAKE_GEN(pedal2btn);
+  MAKE_GEN(pedal2numpad);
   RENAME_GEN(redirect,redirect_trans);
   RENAME_GEN(multi,multitrans);
   //add a quick mouse redirect
@@ -747,6 +748,11 @@ event_translator* MGparser::parse_special_trans(enum entry_type intype, complex_
   if ((intype == DEV_AXIS) && expr->ident == PEDAL_2_BTN && expr->params.size() == 1) {
     int btn = read_ev_code(expr->params[0]->ident, OUT_KEY);
     return new pedal2btn(btn, mg->slots->keyboard.virt_dev.get());
+  }
+
+  if ((intype == DEV_AXIS) && expr->ident == PEDAL_2_NUMPAD) {
+    int btn = read_ev_code(expr->params[0]->ident, OUT_KEY);
+    return new pedal2numpad(mg->slots->keyboard.virt_dev.get());
   }
 
   //Axis to buttons.

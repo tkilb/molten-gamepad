@@ -1,9 +1,9 @@
 #pragma once
 
 #define ABS_RANGE 32768
+#define UNSIGNED_ABS_RANGE 65536
 #define MIN_PEDAL_VALUE -30000
 #define MAX_KEYBOARD_ASCII 1000
-#define PEDAL_2_BTN "pedal2btn"
 
 enum MGType {
   MG_NULL,

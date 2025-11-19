@@ -1,11 +1,13 @@
 #pragma once
 #include "../event_change.h"
 
+#define PEDAL_2_BTN "pedal2btn"
+
 class pedal2btn : public event_translator {
 public:
   virtual_device* virt_keyboard = nullptr;
   int btn;
-  int pos_cache = 0;
+  int val_cache = 0;
 
   pedal2btn(int btn, virtual_device* virt_keyboard) : btn(btn), virt_keyboard(virt_keyboard) {
   }
