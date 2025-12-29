@@ -46,7 +46,9 @@ POSTCOMPILE = mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 
 
 all : moltengamepad plugins documentation/moltengamepad.1
-	./moltengamepad -n 1
+	mkdir -p ${HOME}/bin
+	cp moltengamepad ${HOME}/bin/moltengamepad
+	# ./moltengamepad -n 1
 
 .SECONDEXPANSION:
 %.o : %.c

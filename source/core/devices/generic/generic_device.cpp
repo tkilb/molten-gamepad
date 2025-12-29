@@ -14,14 +14,15 @@ generic_device::generic_device(std::vector<split_ev_info>& split_events, int tot
   }
 
   for (uint i = 0; i < split_events.size(); i++) {
-    
+
     input_absinfo     abs;
     memset(&abs, 0, sizeof(abs));
 
     auto ev = split_events[i];
 
     eventstates[ev.id] = EVENT_ACTIVE;
-    
+    // std::cout << "||" << abs.maximum << "||";
+
 
     int type = EV_KEY;
     if (ev.type == DEV_AXIS) type = EV_ABS;
@@ -29,6 +30,7 @@ generic_device::generic_device(std::vector<split_ev_info>& split_events, int tot
 
     evcode code(type, ev.code);
     //Read in ABS ranges so we can rescale the generated events
+    // std::cout << "||" << ev.code << "-" << ev.type << "_" << split_events[i].code << "||";
     if (ev.type == DEV_AXIS) {
       if (ioctl(fd, EVIOCGABS(split_events[i].code), &abs)) {
         perror("evdev EVIOCGABS ioctl");
@@ -46,7 +48,7 @@ int generic_device::init(input_source* ref) {
 
   int internal[2];
   int res = pipe(internal);
-  if (res != 0) 
+  if (res != 0)
     throw std::runtime_error("internal pipe creation failed.");
   methods.watch_file(ref, internal[0], &pipe_read);
   pipe_write = internal[1];
@@ -101,7 +103,7 @@ int generic_device::upload_ff(ff_effect* effect) {
     perror("gendev upload FF ioctl");
   return effect->id;
 }
-  
+
 int generic_device::erase_ff(int id) {
   if (!rumble)
     return -1;
