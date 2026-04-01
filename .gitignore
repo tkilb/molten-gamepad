@@ -4,3 +4,5 @@ moltengamepad
 *.so
 *.po
 *.a
+human.sh
+output-for-ai.txt

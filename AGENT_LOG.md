@@ -27,15 +27,28 @@ Senior Game Controller Engineer AI Agent
   
 - [x] Created AGENT_LOG.md template for session tracking
 
-- [ ] G920 Configuration: **IN PROGRESS**
-  - Need to create `~/.config/moltengamepad/gendevices/logitech-g920.cfg`
-  - Need user to run `evtest` to verify exact device name and event codes
-  - Template config ready in AGENT_GUIDE.md
+- [x] Created G920 Configuration File:
+  - Created `~/.config/moltengamepad/gendevices/logitech-g920.cfg`
+  - Includes steering wheel, pedals, D-pad, face buttons, paddle shifters
+  - Includes aliases for gamepad profile compatibility
+  - Includes usage notes and troubleshooting tips
+  
+- [x] Fixed G920 Device Detection:
+  - Issue: G920 not appearing as input device
+  - Solution: Arch Wiki directed us to use hid_logitech_hidpp driver (already loaded)
+  - Device now appears as: `Logitech G920 Driving Force Racing Wheel` at `/dev/input/event269` and `/dev/input/js4`
+  - Updated config file with correct device name
 
 ### Current State
-The AI agents file has been created at `/home/tylerkilburn/Programs/molten-gamepad/AGENT_GUIDE.md`. 
+**G920 is now detected by the system.** The configuration file has been updated with the correct device name.
 
-The G920 configuration file needs to be created, but requires verification of the exact device name string from evtest output to ensure proper device matching.
+Files created/modified:
+1. `/home/tylerkilburn/Programs/molten-gamepad/AGENT_GUIDE.md` - AI agent documentation
+2. `/home/tylerkilburn/Programs/molten-gamepad/AGENT_LOG.md` - Running session log
+3. `/home/tylerkilburn/.config/moltengamepad/gendevices/logitech-g920.cfg` - G920 wheel config (updated device name)
+4. `/home/tylerkilburn/Programs/molten-gamepad/human.sh` - Diagnostic script
+
+**NEXT STEPS**: Test MoltenGamepad with the G920.
 
 ### Known Issues/Blockers
 - **G920 Device Name**: The exact device name string reported by the kernel needs verification. Common variants:
