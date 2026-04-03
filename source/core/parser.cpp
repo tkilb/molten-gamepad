@@ -32,7 +32,7 @@ void print_tokens(std::vector<token>& tokens) {
 }
 
 bool isIdent(char c) {
-  return isalnum(c) || c == '_' || c == '-' || c == '+' || c == '?' || c == '^' || c == '%' ;
+  return isalnum(c) || c == '_' || c == '-' || c == '+' || c == '?' || c == '^' || c == '%' || c == '~' ;
 }
 
 std::vector<token> tokenize(std::string line) {
@@ -720,6 +720,9 @@ event_translator* MGparser::parse_special_trans(enum entry_type intype, complex_
       } else if (outevent.back() == '%') {
         outevent.pop_back();
         direction = -2;
+      } else if (outevent.back() == '~') {
+        outevent.pop_back();
+        direction = 3;
       } else if (outevent[0] == '+') {
         //For backwards compatibility, allow +/- to be in front as well.
         outevent.erase(outevent.begin());

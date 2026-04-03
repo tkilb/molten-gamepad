@@ -1,5 +1,6 @@
 #include "slot_manager.h"
 #include "virtual_devices/virtual_kbm.h"
+#include "virtual_devices/virtual_wheel.h"
 #include <csignal>
 
 slot_manager::slot_manager(int max_pads, bool keys, const virtpad_settings& padstyle) : log("slot"),  opts([&] (std::string& name, MGField value){ return process_option(name, value); }), max_pads(max_pads)
@@ -81,7 +82,11 @@ slot_manager::~slot_manager() {
 //should only be called while holding a lock.
 void slot_manager::open_pad_slot(int index) {
   output_slot &slot = slots[index];
-  slot.virt_dev = std::make_shared<virtual_gamepad>(slot.name, "A virtual gamepad", padstyle, this, ui);
+  if (padstyle.type == VIRTPAD_WHEEL) {
+    slot.virt_dev = std::make_shared<virtual_wheel>(slot.name, "A virtual racing wheel", padstyle, this, ui);
+  } else {
+    slot.virt_dev = std::make_shared<virtual_gamepad>(slot.name, "A virtual gamepad", padstyle, this, ui);
+  }
   slot.virt_dev->init();
   slot.has_devices = false;
   log.slot_event(0, &slots[index], "open");

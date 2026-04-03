@@ -11,6 +11,7 @@
 #include "devices/device.h"
 #include "slot_manager.h"
 #include "uinput.h"
+#include "virtpad_settings.h"
 #include "udev.h"
 #include "signalflags.h"
 #include "protocols/message_stream.h"

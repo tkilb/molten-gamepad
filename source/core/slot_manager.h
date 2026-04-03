@@ -6,6 +6,7 @@
 #include <functional>
 
 #include "uinput.h"
+#include "virtpad_settings.h"
 #include "virtual_devices/virtual_device.h"
 #include "virtual_devices/virtual_gamepad.h"
 #include "devices/device.h"

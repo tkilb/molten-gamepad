@@ -136,6 +136,86 @@ int uinput::make_gamepad(const uinput_ids& ids, bool dpad_as_hat, bool analog_tr
   return fd;
 }
 
+int uinput::make_wheel(const uinput_ids& ids, bool rumble) {
+  struct uinput_user_dev uidev;
+  int fd;
+  int i;
+  int mode = O_WRONLY;
+  if (rumble)
+    mode = O_RDWR;
+  fd = open(filename, mode | O_NONBLOCK);
+  if (fd < 0) {
+    perror("open uinput");
+    return -1;
+  }
+  memset(&uidev, 0, sizeof(uidev));
+  strncpy(uidev.name, ids.device_string.c_str(), UINPUT_MAX_NAME_SIZE-1);
+  uidev.id.bustype = BUS_USB;
+  uidev.id.vendor = ids.vendor_id;
+  uidev.id.product = ids.product_id;
+  uidev.id.version = ids.version_id;
+
+  ioctl(fd, UI_SET_EVBIT, EV_ABS);
+  // Steering
+  ioctl(fd, UI_SET_ABSBIT, ABS_X);
+  uidev.absmin[ABS_X] = 0;
+  uidev.absmax[ABS_X] = 65535;
+  uidev.absflat[ABS_X] = 0;
+  // Accelerator
+  ioctl(fd, UI_SET_ABSBIT, ABS_Y);
+  uidev.absmin[ABS_Y] = 0;
+  uidev.absmax[ABS_Y] = 255;
+  uidev.absflat[ABS_Y] = 0;
+  // Brake
+  ioctl(fd, UI_SET_ABSBIT, ABS_Z);
+  uidev.absmin[ABS_Z] = 0;
+  uidev.absmax[ABS_Z] = 255;
+  uidev.absflat[ABS_Z] = 0;
+  // Clutch
+  ioctl(fd, UI_SET_ABSBIT, ABS_RZ);
+  uidev.absmin[ABS_RZ] = 0;
+  uidev.absmax[ABS_RZ] = 255;
+  uidev.absflat[ABS_RZ] = 0;
+  // D-pad
+  ioctl(fd, UI_SET_ABSBIT, ABS_HAT0X);
+  uidev.absmin[ABS_HAT0X] = -1;
+  uidev.absmax[ABS_HAT0X] = 1;
+  ioctl(fd, UI_SET_ABSBIT, ABS_HAT0Y);
+  uidev.absmin[ABS_HAT0Y] = -1;
+  uidev.absmax[ABS_HAT0Y] = 1;
+
+  ioctl(fd, UI_SET_EVBIT, EV_KEY);
+  // Buttons
+  for (i = 288; i <= 313; i++) ioctl(fd, UI_SET_KEYBIT, i);
+  for (i = 704; i <= 711; i++) ioctl(fd, UI_SET_KEYBIT, i);
+
+  if (rumble) {
+    ioctl(fd, UI_SET_EVBIT, EV_FF);
+    ioctl(fd, UI_SET_FFBIT, FF_RUMBLE);
+    ioctl(fd, UI_SET_FFBIT, FF_CONSTANT);
+    ioctl(fd, UI_SET_FFBIT, FF_SPRING);
+    ioctl(fd, UI_SET_FFBIT, FF_FRICTION);
+    ioctl(fd, UI_SET_FFBIT, FF_DAMPER);
+    ioctl(fd, UI_SET_FFBIT, FF_INERTIA);
+    ioctl(fd, UI_SET_FFBIT, FF_RAMP);
+    ioctl(fd, UI_SET_FFBIT, FF_SQUARE);
+    ioctl(fd, UI_SET_FFBIT, FF_TRIANGLE);
+    ioctl(fd, UI_SET_FFBIT, FF_SINE);
+    ioctl(fd, UI_SET_FFBIT, FF_SAW_UP);
+    ioctl(fd, UI_SET_FFBIT, FF_SAW_DOWN);
+    ioctl(fd, UI_SET_FFBIT, FF_GAIN);
+    ioctl(fd, UI_SET_FFBIT, FF_AUTOCENTER);
+    uidev.ff_effects_max = 16;
+  }
+  ioctl(fd, UI_SET_PHYS, ids.phys.c_str());
+
+  ssize_t res = write(fd, &uidev, sizeof(uidev));
+  if (res < 0) perror("uinput device setup write");
+  if (ioctl(fd, UI_DEV_CREATE) < 0) perror("uinput device creation");
+
+  return fd;
+}
+
 
 int uinput::make_keyboard(const uinput_ids& ids) {
   struct uinput_user_dev uidev;

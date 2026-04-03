@@ -1,12 +1,6 @@
 #pragma once
 #include "virtual_device.h"
-
-struct virtpad_settings {
-  uinput_ids u_ids;
-  bool dpad_as_hat;
-  bool analog_triggers;
-  bool rumble;
-};
+#include "../virtpad_settings.h"
 
 class virtual_gamepad : public virtual_device {
 public:

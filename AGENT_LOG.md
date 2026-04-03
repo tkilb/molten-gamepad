@@ -43,10 +43,10 @@ Senior Game Controller Engineer AI Agent
 **G920 is now detected by the system.** The configuration file has been updated with the correct device name.
 
 Files created/modified:
-1. `/home/tylerkilburn/Programs/molten-gamepad/AGENT_GUIDE.md` - AI agent documentation
-2. `/home/tylerkilburn/Programs/molten-gamepad/AGENT_LOG.md` - Running session log
-3. `/home/tylerkilburn/.config/moltengamepad/gendevices/logitech-g920.cfg` - G920 wheel config (updated device name)
-4. `/home/tylerkilburn/Programs/molten-gamepad/human.sh` - Diagnostic script
+1. `~/Programs/molten-gamepad/AGENT_GUIDE.md` - AI agent documentation
+2. `~/Programs/molten-gamepad/AGENT_LOG.md` - Running session log
+3. `~/.config/moltengamepad/gendevices/logitech-g920.cfg` - G920 wheel config (updated device name)
+4. `~/Programs/molten-gamepad/human.sh` - Diagnostic script
 
 **NEXT STEPS**: Test MoltenGamepad with the G920.
 
@@ -59,8 +59,8 @@ Files created/modified:
 - **Separate Pedal Device**: The G920 pedals may appear as a separate input device from the wheel base. May need two config files or a multi-device match.
 
 ### Files Modified
-- `/home/tylerkilburn/Programs/molten-gamepad/AGENT_GUIDE.md` - Created (AI agent documentation)
-- `/home/tylerkilburn/Programs/molten-gamepad/AGENT_LOG.md` - Created (this file)
+- `~/Programs/molten-gamepad/AGENT_GUIDE.md` - Created (AI agent documentation)
+- `~/Programs/molten-gamepad/AGENT_LOG.md` - Created (this file)
 
 ### Next Steps for Continuation
 1. **User Action Required**: Run `evtest` with G920 connected to get exact device name(s)
@@ -87,27 +87,45 @@ Files created/modified:
 
 ---
 
-## Session Notes Template
+## Session: 2026-04-01 - G920 Configuration and Testing
 
-### Session: [DATE] - [TASK]
+### Agent
+Senior Game Controller Engineer AI Agent
 
 ### Objectives
-- [ ] Task item 1
-- [ ] Task item 2
+- [x] Restore G920 force feedback (FFB) functionality
+- [x] Create G920 configuration for MoltenGamepad
+- [x] Test G920 configuration with `moltengamepad`
 
 ### Progress Made
-- Detailed bullet points of what was accomplished
+- [x] **Restored G920 FFB**: 
+    - Issue: FFB command queue was flooded, causing delays/unresponsiveness.
+    - Solution: Reloaded the `hid_logitech_hidpp` driver (`rmmod`/`modprobe`).
+    - Verified: Wheel performed calibration dance and `fftest` now works.
+- [x] **Created G920 Config**:
+    - Created `~/.config/moltengamepad/gendevices/logitech-g920.cfg`.
+    - Format: `key(##)` for buttons, friendly names for axes.
+    - Labels: Xbox naming conventions (A, B, X, Y, LB, RB, Back, Start, Guide).
+- [x] **Renamed Config and Device**:
+    - Renamed `~/.config/moltengamepad/gendevices/logitech-g920.cfg` to `~/.config/moltengamepad/gendevices/g920.cfg`.
+    - Updated `devname = "g920"` in the file.
+- [x] **Verified MoltenGamepad Integration**:
+    - Ran `moltengamepad --mimic-xpad --rumble`.
+    - Confirmed `g920_1` device is plugged in.
+    - Verified all axes (steering, pedals, dpad) and buttons (A, B, X, Y, bumpers, paddles, etc.) are correctly mapped.
 
 ### Current State
-[Paragraph describing current progress and immediate next actions]
+**G920 is fully configured and functional in MoltenGamepad.**
 
-### Known Issues/Blockers
-[Any problems encountered or decisions pending]
+The driver is correctly mapping the physical events to the defined labels, and `moltengamepad` is ready to be used with games. The FFB issue was resolved by a driver reload.
 
 ### Files Modified
-- List of files changed with brief descriptions
+- `~/.config/moltengamepad/gendevices/logitech-g920.cfg` - Created G920 device definition.
+- `~/Programs/molten-gamepad/AGENT_LOG.md` - Updated session log.
 
 ### Next Steps for Continuation
-[Clear, actionable instructions for the next agent]
+1. **In-game Testing**: Test the wheel in a game (e.g., Forza, Assetto Corsa) using a MoltenGamepad profile.
+2. **Profile Tuning**: Create or adjust MG profiles to map `g920` axes/buttons to specific game needs.
+3. **Persist FFB Fix**: If the "command queue flooded" issue recurs, consider a udev rule or script to automatically reload the driver on connection if necessary (though usually, a one-time fix is enough unless the device is disconnected).
 
 ---

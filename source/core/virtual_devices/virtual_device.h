@@ -17,8 +17,8 @@ class virtual_device : public std::enable_shared_from_this<virtual_device> {
 public:
   std::string name;
   std::string descr;
-  virtual_device(std::string name, slot_manager* slot_man) : name(name), slot_man(slot_man) { effects[0].id = -1;};
-  virtual_device(std::string name, std::string descr, slot_manager* slot_man) : name(name), descr(descr), slot_man(slot_man) {effects[0].id = -1;};
+  virtual_device(std::string name, slot_manager* slot_man) : name(name), slot_man(slot_man) { for (int i = 0; i < 16; i++) effects[i].id = -1; };
+  virtual_device(std::string name, std::string descr, slot_manager* slot_man) : name(name), descr(descr), slot_man(slot_man) { for (int i = 0; i < 16; i++) effects[i].id = -1; };
   virtual ~virtual_device();
   virtual void take_event(struct input_event in) {
   }
@@ -46,7 +46,7 @@ public:
   void ref();
   void unref();
 
-  ff_effect effects[1];
+  ff_effect effects[16];
 protected:
   std::vector<std::weak_ptr<input_source>> devices;
   std::vector<input_event> delayed_events;

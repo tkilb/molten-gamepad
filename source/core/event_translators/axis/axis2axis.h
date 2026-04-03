@@ -15,6 +15,12 @@ public:
     if (direction == -2) {
       value = -(ev.value + ABS_RANGE) / 2;
     }
+    if (direction == 3) {
+      value = ev.value - ABS_RANGE;
+    }
+    if (direction == -3) {
+      value = -(ev.value - ABS_RANGE);
+    }
     if (value < -ABS_RANGE) value = -ABS_RANGE;
     if (value > ABS_RANGE) value = ABS_RANGE;
     struct input_event out_ev;

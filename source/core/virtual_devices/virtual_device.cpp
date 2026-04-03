@@ -52,8 +52,10 @@ bool virtual_device::accept_device(std::shared_ptr<input_source> dev) {
 bool virtual_device::add_device(std::shared_ptr<input_source> dev) {
   std::lock_guard<std::mutex> guard(lock);
   devices.push_back(dev);
-  if (effects[0].id != -1)
-    dev->upload_ff(effects[0]);
+  for (int i = 0; i < 16; i++) {
+    if (effects[i].id != -1)
+      dev->upload_ff(effects[i]);
+  }
   return true;
 }
 
@@ -79,11 +81,16 @@ void virtual_device::clear_outputs() {
 bool virtual_device::close_virt_device() {
   bool success = true;
   lock.lock();
-  //check for ff effect
-  if (effects[0].id != -1) {
-    //Bad stuff might happen with uinput module.
-    success = false;
-  } else {
+  //check for ff effects
+  for (int i = 0; i < 16; i++) {
+    if (effects[i].id != -1) {
+      //Bad stuff might happen with uinput module.
+      success = false;
+      break;
+    }
+  }
+
+  if (success) {
     //close/destroy the uinput device -- device type specific.
     destroy_uinput_devs();
   }
@@ -95,37 +102,60 @@ bool virtual_device::close_virt_device() {
 
 int virtual_device::upload_ff(const ff_effect& effect) {
   std::lock_guard<std::mutex> guard(lock);
-  if (effect.id == -1 && effects[0].id != -1)
+  int id = effect.id;
+  if (id < 0) {
+    //find a free slot
+    for (int i = 0; i < 16; i++) {
+      if (effects[i].id == -1) {
+        id = i;
+        break;
+      }
+    }
+  }
+  if (id < 0 || id >= 16)
     return -1;
-  effects[0] = effect;
+
+  effects[id] = effect;
+  effects[id].id = id;
   self_ref_to_prevent_deletion_with_ff = this->shared_from_this();
   for (auto it = devices.begin(); it != devices.end(); it++) {
     auto ptr = it->lock();
-    ptr->upload_ff(effect);
+    if (ptr) ptr->upload_ff(effects[id]);
   }
-  return 0; //return an id for this event.
+  return id; 
 }
 
 int virtual_device::erase_ff(int id) {
   std::lock_guard<std::mutex> guard(lock);
-  if (id != 0)
+  if (id < 0 || id >= 16)
     return FAILURE;
-  effects[0].id = -1;
-  self_ref_to_prevent_deletion_with_ff = nullptr;
+  effects[id].id = -1;
+
+  //check if any effects remain
+  bool effects_remain = false;
+  for (int i = 0; i < 16; i++) {
+    if (effects[i].id != -1) {
+      effects_remain = true;
+      break;
+    }
+  }
+  if (!effects_remain)
+    self_ref_to_prevent_deletion_with_ff = nullptr;
+
   for (auto it = devices.begin(); it != devices.end(); it++) {
     auto ptr = it->lock();
-    ptr->erase_ff(id);
+    if (ptr) ptr->erase_ff(id);
   }
-  return SUCCESS; //return an id for this event.
+  return SUCCESS; 
 }
 
 int virtual_device::play_ff(int id, int repetitions) {
   std::lock_guard<std::mutex> guard(lock);
-  if (id != 0 || effects[0].id == -1)
+  if (id < 0 || id >= 16 || effects[id].id == -1)
     return FAILURE;
   for (auto it = devices.begin(); it != devices.end(); it++) {
     auto ptr = it->lock();
-    ptr->play_ff(id, repetitions);
+    if (ptr) ptr->play_ff(id, repetitions);
   }
   return SUCCESS;
 }

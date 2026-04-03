@@ -232,6 +232,7 @@ int parse_opts(options& options, int argc, char* argv[]) {
     {"no-monitor",    0,    0,    0},
     {"dpad-as-hat",   0,    0,    0},
     {"mimic-xpad",    0,    0,    0},
+    {"mimic-g920",    0,    0,    0},
     {"daemon",        0,    0,  'd'},
     {"rumble",        0,    0,  'R'},
     {"verbose",       0,    0,  'V'},
@@ -274,6 +275,10 @@ int parse_opts(options& options, int argc, char* argv[]) {
       if (long_index == 14) {
         options.set("mimic_xpad","true");
         options.lock("mimic_xpad", true);
+      };
+      if (long_index == 15) {
+        options.set("mimic_g920","true");
+        options.lock("mimic_g920", true);
       };
       if (long_index == 18) {
         options.set("stay_alive","true");
