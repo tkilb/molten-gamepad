@@ -121,7 +121,9 @@ int uinput::make_gamepad(const uinput_ids& ids, bool dpad_as_hat, bool analog_tr
   if (rumble) {
     ioctl(fd, UI_SET_EVBIT, EV_FF);
     ioctl(fd, UI_SET_FFBIT, FF_RUMBLE);
-    uidev.ff_effects_max = 1;
+    ioctl(fd, UI_SET_FFBIT, FF_PERIODIC);
+    ioctl(fd, UI_SET_FFBIT, FF_CUSTOM);
+    uidev.ff_effects_max = 16;
   }
   ioctl(fd, UI_SET_PHYS, ids.phys.c_str());
 
@@ -193,6 +195,8 @@ int uinput::make_wheel(const uinput_ids& ids, bool rumble) {
     ioctl(fd, UI_SET_EVBIT, EV_FF);
     ioctl(fd, UI_SET_FFBIT, FF_RUMBLE);
     ioctl(fd, UI_SET_FFBIT, FF_CONSTANT);
+    ioctl(fd, UI_SET_FFBIT, FF_PERIODIC);
+    ioctl(fd, UI_SET_FFBIT, FF_CUSTOM);
     ioctl(fd, UI_SET_FFBIT, FF_SPRING);
     ioctl(fd, UI_SET_FFBIT, FF_FRICTION);
     ioctl(fd, UI_SET_FFBIT, FF_DAMPER);
@@ -400,7 +404,7 @@ void uinput::ff_thread_loop() {
         ioctl(uinput_fd, UI_BEGIN_FF_UPLOAD, &effect);
         if (slot) {
           int id = slot->upload_ff(effect.effect);
-          effect.retval = (id < 0); //fail if id < 0
+          effect.retval = (id < 0) ? -1 : 0;
           effect.effect.id = id;
         } else {
           //no slot? Just say this upload fails.
@@ -417,7 +421,10 @@ void uinput::ff_thread_loop() {
 
         ioctl(uinput_fd, UI_BEGIN_FF_ERASE, &effect);
         if (slot) {
-          slot->erase_ff(effect.effect_id);
+          int ret = slot->erase_ff(effect.effect_id);
+          effect.retval = (ret < 0) ? -1 : 0;
+        } else {
+          effect.retval = -1;
         }
         ioctl(uinput_fd, UI_END_FF_ERASE, &effect);
       }

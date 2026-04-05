@@ -124,7 +124,7 @@ protected:
   std::mutex slot_lock;
   std::shared_ptr<virtual_device> out_dev = nullptr;
   std::shared_ptr<virtual_device> assigned_slot = nullptr; //might differ from the above due to thread synchro.
-  int ff_ids[1]; //Since the physical device might hand us different ids.
+  int ff_ids[16]; //Since the physical device might hand us different ids.
 
   std::vector<recurring_info> recurring_events;
   std::vector<const group_translator*> group_recurring_events;

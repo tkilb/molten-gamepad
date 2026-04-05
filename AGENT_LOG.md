@@ -129,3 +129,46 @@ The driver is correctly mapping the physical events to the defined labels, and `
 3. **Persist FFB Fix**: If the "command queue flooded" issue recurs, consider a udev rule or script to automatically reload the driver on connection if necessary (though usually, a one-time fix is enough unless the device is disconnected).
 
 ---
+
+## Session: 2026-04-05 - Force Feedback Core Improvements & Assignment Debugging
+
+### Agent
+Senior Game Controller Engineer AI Agent
+
+### Objectives
+- [x] Analyze and fix Force Feedback (FFB) limitations in MoltenGamepad core
+- [x] Support multiple simultaneous effects (up to 16) for racing wheels
+- [x] Correctly map virtual effect IDs to physical device IDs
+- [x] Fix kernel-level reporting of FFB success/failure
+- [x] Debug why `fftest` shows no physical response despite virtual success
+
+### Progress Made
+- [x] **Core FFB Architecture Overhaul**:
+    - **Increased Slot Capacity**: Expanded `ff_ids` in `input_source` from 1 to 16.
+    - **ID Mapping**: Updated `input_source::upload_ff`, `erase_ff`, and `play_ff` to use the virtual effect ID as an index. This ensures that when a game requests "Effect #3", it actually plays the correct physical effect.
+    - **Global Commands**: Modified `virtual_device` and `input_source` to allow `FF_GAIN` and `FF_AUTOCENTER` to pass through. Previously, these were being blocked by range checks that only expected effect IDs (0-15).
+- [x] **Kernel/Uinput Reliability**:
+    - **Bitmask Expansion**: Added `FF_PERIODIC` and `FF_CUSTOM` to the virtual wheel in `uinput.cpp` to match the physical G920.
+    - **Retval Correction**: Fixed a bug in the `uinput` thread loop where success was being reported incorrectly (or not at all for erasures), causing potential sync issues with the kernel.
+- [x] **Verification Logic**:
+    - **Physical Confirmation**: Updated `virtual_device::upload_ff` to verify that at least one physical device successfully accepted the effect before reporting success to the kernel. This prevents "false positive" successes in `fftest`.
+- [x] **Debugging Infrastructure**:
+    - Added extensive logging to `input_source` and `generic_device` to track FF uploads, erasures, and play commands.
+
+### Current State
+**The FFB path is now structurally complete and much more robust.** 
+
+During testing, we discovered that the G920 (`g9201`) was being detected but **not assigned** to a virtual slot (`virtpad1`). This explains why `fftest` previously reported success (due to a bug in reporting I've since fixed) but the wheel didn't move: the commands were hitting the virtual device but had no physical destination.
+
+### Files Modified
+- `source/core/devices/device.h`: Increased `ff_ids` array.
+- `source/core/devices/input_source.cpp`: Implemented ID mapping and logging.
+- `source/core/uinput.cpp`: Fixed bitmasks and kernel return values.
+- `source/core/virtual_devices/virtual_device.cpp`: Added physical success verification and allowed global FF commands.
+- `source/core/devices/generic/generic_device.cpp`: Added debug logging for physical ioctls.
+
+### Next Steps & Thinking
+1.  **Manual Assignment**: The user needs to move the wheel to a slot using `move g9201 to virtpad1`. 
+2.  **Verify with `fftest`**: With the new "Physical Confirmation" logic, `fftest` should now correctly report an error if the wheel is not assigned, and "OK" only when the command actually reaches the hardware.
+3.  **Check Permissions**: If the wheel is assigned but `generic_device` logs `EACCES`, we may need to adjust udev rules for the physical `/dev/input/eventX` nodes.
+4.  **Auto-Assign Tuning**: Investigate why the wheel isn't being auto-assigned. This may be due to the `forza-horizon-5` profile or global `auto_assign` settings.

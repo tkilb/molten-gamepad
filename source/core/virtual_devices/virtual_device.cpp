@@ -118,11 +118,15 @@ int virtual_device::upload_ff(const ff_effect& effect) {
   effects[id] = effect;
   effects[id].id = id;
   self_ref_to_prevent_deletion_with_ff = this->shared_from_this();
+  bool success = false;
   for (auto it = devices.begin(); it != devices.end(); it++) {
     auto ptr = it->lock();
-    if (ptr) ptr->upload_ff(effects[id]);
+    if (ptr) {
+      int ret = ptr->upload_ff(effects[id]);
+      if (ret == 0) success = true;
+    }
   }
-  return id; 
+  return success ? id : -1; 
 }
 
 int virtual_device::erase_ff(int id) {
@@ -151,8 +155,10 @@ int virtual_device::erase_ff(int id) {
 
 int virtual_device::play_ff(int id, int repetitions) {
   std::lock_guard<std::mutex> guard(lock);
-  if (id < 0 || id >= 16 || effects[id].id == -1)
-    return FAILURE;
+  if (id != FF_GAIN && id != FF_AUTOCENTER) {
+    if (id < 0 || id >= 16 || effects[id].id == -1)
+      return FAILURE;
+  }
   for (auto it = devices.begin(); it != devices.end(); it++) {
     auto ptr = it->lock();
     if (ptr) ptr->play_ff(id, repetitions);

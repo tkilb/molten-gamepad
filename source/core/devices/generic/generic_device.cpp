@@ -95,28 +95,33 @@ void generic_device::process(void* tag) {
 }
 
 int generic_device::upload_ff(ff_effect* effect) {
-  if (!rumble)
+  if (!rumble) {
     return -1;
+  }
   int fd = file->get_fd();
   int ret = ioctl(fd, EVIOCSFF, effect);
-  if (ret < 0)
+  if (ret < 0) {
     perror("gendev upload FF ioctl");
+  }
   return effect->id;
 }
 
 int generic_device::erase_ff(int id) {
-  if (!rumble)
+  if (!rumble) {
     return -1;
+  }
   int fd = file->get_fd();
   int ret = ioctl(fd, EVIOCRMFF, id);
-  if (ret < 0)
+  if (ret < 0) {
     perror("gendev erase FF ioctl");
+  }
   return 0;
 }
 
 int generic_device::play_ff(int id, int repetitions) {
-  if (!rumble)
+  if (!rumble) {
     return -1;
+  }
   int fd = file->get_fd();
   input_event ev;
   memset(&ev, 0, sizeof(ev));
@@ -124,7 +129,10 @@ int generic_device::play_ff(int id, int repetitions) {
   ev.code = id;
   ev.value = repetitions;
   ssize_t res = write(fd, &ev, sizeof(ev));
-  if (res < 0)
+  if (res < 0) {
     perror("gendev write FF event");
+  } else {
+    ref->manager->log.take_message(0, ref->get_name() + " generic_device:play_ff code=" + std::to_string(id) + " val=" + std::to_string(repetitions));
+  }
   return 0;
 }

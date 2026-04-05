@@ -28,7 +28,7 @@ input_source::input_source(device_manager* manager, device_plugin plugin, void* 
   priv_pipe = internal[1];
   internalpipe = internal[0];
 
-  ff_ids[0] = -1;
+  for (int i = 0; i < 16; i++) ff_ids[i] = -1;
 }
   
 
@@ -679,15 +679,23 @@ void input_source::print(std::string message) {
 
 int input_source::upload_ff(ff_effect effect) {
   if (plugin.upload_ff) {
-    effect.id = ff_ids[0];
-    ff_ids[0] = plugin.upload_ff(plug_data,&effect);
-    if (ff_ids[0] < 0) ff_ids[0] = -1;
+    int virt_id = effect.id;
+    if (virt_id < 0 || virt_id >= 16) return -1;
+    effect.id = ff_ids[virt_id];
+    int old_phys_id = effect.id;
+    ff_ids[virt_id] = plugin.upload_ff(plug_data,&effect);
+    manager->log.take_message(0, name + " upload_ff: virt=" + std::to_string(virt_id) + " phys_old=" + std::to_string(old_phys_id) + " phys_new=" + std::to_string(ff_ids[virt_id]));
+    if (ff_ids[virt_id] < 0) {
+      ff_ids[virt_id] = -1;
+      return -1;
+    }
   }
-  return -(ff_ids[0] < 0);
+  return 0;
 }
 
 int input_source::erase_ff(int id) {
-  if (plugin.erase_ff) {
+  if (id < 0 || id >= 16) return -1;
+  if (plugin.erase_ff && ff_ids[id] != -1) {
     int ret = plugin.erase_ff(plug_data, ff_ids[id]);
     ff_ids[id] = -1;
     return ret;
@@ -696,7 +704,17 @@ int input_source::erase_ff(int id) {
 }
 
 int input_source::play_ff(int id, int repetitions) {
-  if (plugin.play_ff)
+  if (id == FF_GAIN || id == FF_AUTOCENTER) {
+    if (plugin.play_ff) {
+      manager->log.take_message(0, name + " play_ff: global code=" + std::to_string(id) + " val=" + std::to_string(repetitions));
+      return plugin.play_ff(plug_data, id, repetitions);
+    }
+    return -1;
+  }
+  if (id < 0 || id >= 16) return -1;
+  if (plugin.play_ff && ff_ids[id] != -1) {
+    manager->log.take_message(0, name + " play_ff: virt=" + std::to_string(id) + " phys=" + std::to_string(ff_ids[id]) + " reps=" + std::to_string(repetitions));
     return plugin.play_ff(plug_data, ff_ids[id], repetitions);
+  }
   return -1;
 }
