@@ -31,6 +31,7 @@ public:
   ~uinput();
   int make_gamepad(const uinput_ids& ids, bool dpad_as_hat, bool analog_triggers, bool rumble);
   int make_wheel(const uinput_ids& ids, bool rumble);
+  int make_joystick(const uinput_ids& ids, bool rumble);
   int make_keyboard(const uinput_ids& ids);
   int make_mouse(const uinput_ids& ids);
   int watch_for_ff(int fd, std::shared_ptr<virtual_device>& slot);

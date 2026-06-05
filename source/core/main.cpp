@@ -233,6 +233,7 @@ int parse_opts(options& options, int argc, char* argv[]) {
     {"dpad-as-hat",   0,    0,    0},
     {"mimic-xpad",    0,    0,    0},
     {"mimic-g920",    0,    0,    0},
+    {"mimic-joystick", 0,   0,    0},
     {"daemon",        0,    0,  'd'},
     {"rumble",        0,    0,  'R'},
     {"verbose",       0,    0,  'V'},
@@ -280,19 +281,23 @@ int parse_opts(options& options, int argc, char* argv[]) {
         options.set("mimic_g920","true");
         options.lock("mimic_g920", true);
       };
-      if (long_index == 18) {
+      if (long_index == 16) {
+        options.set("mimic_joystick","true");
+        options.lock("mimic_joystick", true);
+      };
+      if (long_index == 20) {
         options.set("stay_alive","true");
         options.lock("stay_alive", true);
       };
-      if (long_index == 19) {
+      if (long_index == 21) {
         options.set("replace_fifo","true");
         options.lock("replace_fifo", true);
       };
-      if (long_index == 20) {
+      if (long_index == 22) {
         options.set("make_socket","true");
         options.lock("make_socket", true);
       };
-      if (long_index == 22) {
+      if (long_index == 24) {
         //print-cfg
         options.list_options(list);
         for (option_info& info : list) {

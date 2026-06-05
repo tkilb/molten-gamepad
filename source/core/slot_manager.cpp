@@ -1,6 +1,7 @@
 #include "slot_manager.h"
 #include "virtual_devices/virtual_kbm.h"
 #include "virtual_devices/virtual_wheel.h"
+#include "virtual_devices/virtual_joystick.h"
 #include <csignal>
 
 slot_manager::slot_manager(int max_pads, bool keys, const virtpad_settings& padstyle) : log("slot"),  opts([&] (std::string& name, MGField value){ return process_option(name, value); }), max_pads(max_pads)
@@ -84,6 +85,8 @@ void slot_manager::open_pad_slot(int index) {
   output_slot &slot = slots[index];
   if (padstyle.type == VIRTPAD_WHEEL) {
     slot.virt_dev = std::make_shared<virtual_wheel>(slot.name, "A virtual racing wheel", padstyle, this, ui);
+  } else if (padstyle.type == VIRTPAD_JOYSTICK) {
+    slot.virt_dev = std::make_shared<virtual_joystick>(slot.name, "A virtual joystick", padstyle, this, ui);
   } else {
     slot.virt_dev = std::make_shared<virtual_gamepad>(slot.name, "A virtual gamepad", padstyle, this, ui);
   }

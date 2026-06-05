@@ -35,6 +35,14 @@ const virtpad_settings g920_padstyle = {
   VIRTPAD_WHEEL,
 };
 
+const virtpad_settings generic_joystick_padstyle = {
+  {"MoltenJoystick", "", 0x1234, 0xBEAD, 1}, //u_ids (using Logitech Extreme 3D Pro IDs as a sensible generic)
+  true, //dpad_as_hat
+  false, //analog_triggers (joysticks usually don't have triggers)
+  true, //rumble
+  VIRTPAD_JOYSTICK,
+};
+
 
 volatile bool fifo_looping;
 
@@ -252,6 +260,7 @@ const option_decl general_options[] = {
   {"dpad_as_hat", "Use a hat to represent the dpad, instead of 4 separate buttons", "false", MG_BOOL},
   {"mimic_xpad", "Set virtual devices to match a wired Xbox 360 controller", "false", MG_BOOL},
   {"mimic_g920", "Set virtual devices to match a Logitech G920 Racing Wheel", "false", MG_BOOL},
+  {"mimic_joystick", "Set virtual devices to match a generic joystick", "false", MG_BOOL},
   {"make_keyboard", "Make a virtual keyboard/mouse device", "true", MG_BOOL},
   {"config_dir", "A directory to use instead of $XDG_CONFIG_HOME/moltengamepad", "", MG_STRING},
   {"profile_dir", "A directory to check for profiles before the config directories", "", MG_STRING},
@@ -413,6 +422,7 @@ int moltengamepad::init() {
   opts->get<bool>("dpad_as_hat",padstyle.dpad_as_hat);
   if (opts->get<bool>("mimic_xpad")) padstyle = xpad_padstyle;
   if (opts->get<bool>("mimic_g920")) padstyle = g920_padstyle;
+  if (opts->get<bool>("mimic_joystick")) padstyle = generic_joystick_padstyle;
   opts->get<bool>("rumble",padstyle.rumble);
   slots = new slot_manager(opts->get<int>("num_gamepads"), opts->get<bool>("make_keyboard"), padstyle);
 

@@ -32,7 +32,7 @@ void print_tokens(std::vector<token>& tokens) {
 }
 
 bool isIdent(char c) {
-  return isalnum(c) || c == '_' || c == '-' || c == '+' || c == '?' || c == '^' || c == '%' || c == '~' ;
+  return isalnum(c) || c == '_' || c == '-' || c == '+' || c == '?' || c == '^' || c == '%' || c == '~' || c == '!' ;
 }
 
 std::vector<token> tokenize(std::string line) {
@@ -723,6 +723,9 @@ event_translator* MGparser::parse_special_trans(enum entry_type intype, complex_
       } else if (outevent.back() == '~') {
         outevent.pop_back();
         direction = 3;
+      } else if (outevent.back() == '!') {
+        outevent.pop_back();
+        direction = 4;
       } else if (outevent[0] == '+') {
         //For backwards compatibility, allow +/- to be in front as well.
         outevent.erase(outevent.begin());
@@ -732,7 +735,7 @@ event_translator* MGparser::parse_special_trans(enum entry_type intype, complex_
       }
       //Check for it being an axis
       int out_axis = read_ev_code(outevent, OUT_ABS);
-      if (out_axis >= 0 && intype == DEV_AXIS) return new axis2axis(out_axis, direction);
+      if (out_axis >= 0 && intype == DEV_AXIS) return new axis2axis(out_axis, direction, mg->slots->keyboard.virt_dev.get());
       if (out_axis >= 0 && intype == DEV_KEY)  return new btn2axis(out_axis, direction);
 
       //Check for it being a rel

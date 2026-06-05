@@ -1,5 +1,9 @@
 #pragma once
 
+#define SHORT_ABS_CONVERSION 0.0625
+#define SHORT_ABS_RANGE 2048
+#define UNSIGNED_SHORT_ABS_RANGE 4096
+
 #define ABS_RANGE 32768
 #define UNSIGNED_ABS_RANGE 65536
 #define MIN_PEDAL_VALUE -30000
@@ -24,17 +28,18 @@ enum MGType {
   MG_AXIS_DIR,
 };
 
-#define NEGATIVE_AXIS_DIR (1<<12)
+#define NEGATIVE_AXIS_DIR (1 << 12)
 
 #define EXTRACT_AXIS(axis_dir) (axis_dir & (NEGATIVE_AXIS_DIR - 1))
 
-#define EXTRACT_DIR(axis_dir) ( (axis_dir & NEGATIVE_AXIS_DIR) ? -1 : 1)
+#define EXTRACT_DIR(axis_dir) ((axis_dir & NEGATIVE_AXIS_DIR) ? -1 : 1)
 
-enum event_state { 
-  EVENT_ACTIVE, //Device can currently send this event.
-  EVENT_INACTIVE, //Device might be able to send this event, but not right now.
-  EVENT_DISABLED, //Device will NEVER be able to send this event.
-  //This last one is because all events of a manager are inherited, but a device might not support all.
+enum event_state {
+  EVENT_ACTIVE,   // Device can currently send this event.
+  EVENT_INACTIVE, // Device might be able to send this event, but not right now.
+  EVENT_DISABLED, // Device will NEVER be able to send this event.
+  // This last one is because all events of a manager are inherited, but a
+  // device might not support all.
 };
 
 enum entry_type {
@@ -52,12 +57,11 @@ enum device_claim {
   DEVICE_UNCLAIMED = -1,
 };
 
-//Allow us to report a provisional claim.
-//a later driver might have a stronger claim.
-#define DEVICE_CLAIMED_DEFERRED(X)  (X >= 0 ? X : DEVICE_UNCLAIMED)
+// Allow us to report a provisional claim.
+// a later driver might have a stronger claim.
+#define DEVICE_CLAIMED_DEFERRED(X) (X >= 0 ? X : DEVICE_UNCLAIMED)
 
 enum mg_result_codes {
   SUCCESS = 0,
   FAILURE = -1,
 };
-  

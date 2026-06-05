@@ -1,7 +1,7 @@
 #pragma once
 #include "uinput.h"
 
-enum virtpad_type { VIRTPAD_GAMEPAD, VIRTPAD_WHEEL };
+enum virtpad_type { VIRTPAD_GAMEPAD, VIRTPAD_WHEEL, VIRTPAD_JOYSTICK };
 
 struct virtpad_settings {
   uinput_ids u_ids;
