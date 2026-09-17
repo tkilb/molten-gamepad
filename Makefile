@@ -45,7 +45,7 @@ COMPILE.cpp = $(CXX) $(DEPFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 POSTCOMPILE = mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 
 
-all : moltengamepad plugins documentation/moltengamepad.1
+all : moltengamepad plugins
 	mkdir -p ${HOME}/bin
 	cp moltengamepad ${HOME}/bin/moltengamepad
 	# ./moltengamepad -n 1
