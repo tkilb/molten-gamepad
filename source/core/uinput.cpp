@@ -240,9 +240,10 @@ int uinput::make_joystick(const uinput_ids& ids, bool rumble) {
   int stick_axes[] = {ABS_X, ABS_Y, ABS_Z, ABS_RX, ABS_RY, ABS_RZ, ABS_THROTTLE, ABS_RUDDER};
   for (i = 0; i < 8; i++) {
     ioctl(fd, UI_SET_ABSBIT, stick_axes[i]);
-    uidev.absmin[stick_axes[i]] = -32768;
-    uidev.absmax[stick_axes[i]] = 32767;
-    uidev.absflat[stick_axes[i]] = 1024;
+    uidev.absmin[stick_axes[i]] = 0;
+    uidev.absmax[stick_axes[i]] = 4095;
+    uidev.absflat[stick_axes[i]] = 255;
+    uidev.absfuzz[stick_axes[i]] = 15;
   }
 
   // D-pad (Hat)
@@ -281,7 +282,22 @@ int uinput::make_joystick(const uinput_ids& ids, bool rumble) {
 
   ssize_t res = write(fd, &uidev, sizeof(uidev));
   if (res < 0) perror("uinput device setup write");
-  if (ioctl(fd, UI_DEV_CREATE) < 0) perror("uinput device creation");
+
+  // Set initial value
+  if (ioctl(fd, UI_DEV_CREATE) < 0) {
+    perror("uinput device creation");
+  } else {
+    struct input_event ev;
+    memset(&ev, 0, sizeof(ev));
+    ev.type = EV_ABS;
+    ev.code = ABS_X;
+    ev.value = 2048;
+    write(fd, &ev, sizeof(ev));
+    ev.type = EV_SYN;
+    ev.code = SYN_REPORT;
+    ev.value = 0;
+    write(fd, &ev, sizeof(ev));
+  }
 
   return fd;
 }

@@ -17,46 +17,15 @@ void axis2axis::process(struct mg_ev ev, virtual_device *out) {
   if (direction == -3) {
     value = -(ev.value - ABS_RANGE);
   }
-  if (direction == 4) {
-    value = ABS_RANGE - ((ev.value + ABS_RANGE) / 2);
-
-    if (virt_keyboard) {
-      struct input_event key_ev;
-      memset(&key_ev, 0, sizeof(key_ev));
-      key_ev.type = EV_KEY;
-      bool changed = false;
-
-      // // if value is at 95% of abs, send keypress 'D'
-      // int d_val = (value >= 0.95 * ABS_RANGE);
-      // if (d_val != d_pressed) {
-      //   key_ev.code = KEY_D;
-      //   key_ev.value = d_val;
-      //   write_out(key_ev, virt_keyboard);
-      //   d_pressed = d_val;
-      //   changed = true;
-      // }
-      //
-      // // if value is at 5% of abs, send keypress 'A'
-      // int a_val = (value <= 0.05 * ABS_RANGE);
-      // if (a_val != a_pressed) {
-      //   key_ev.code = KEY_A;
-      //   key_ev.value = a_val;
-      //   write_out(key_ev, virt_keyboard);
-      //   a_pressed = a_val;
-      //   changed = true;
-      // }
-      //
-      // if (changed) {
-      //   flush(virt_keyboard);
-      // }
-    }
-  }
-
 
   if (value < -ABS_RANGE)
     value = -ABS_RANGE;
   if (value > ABS_RANGE)
     value = ABS_RANGE;
+
+  if (direction == 4) {
+    value = SHORT_ABS_RANGE - (SHORT_ABS_CONVERSION * ev.value);
+  }
 
   struct input_event out_ev;
   memset(&out_ev, 0, sizeof(out_ev));

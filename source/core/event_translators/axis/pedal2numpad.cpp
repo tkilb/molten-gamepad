@@ -4,7 +4,7 @@
 #include <linux/input-event-codes.h>
 
 
-const int NUMERIC_KEYS[10] = {KEY_KP1, KEY_KP2, KEY_KP3, KEY_KP4, KEY_KP5, KEY_KP6, KEY_KP7, KEY_KP8, KEY_KP9, KEY_KP0 };
+const int NUMERIC_KEYS[10] = {KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0 };
 
 void pedal2numpad::process(struct mg_ev ev, virtual_device* out) {
   bool isKeyPubCycle = tick_counter < TICK_COUNTER_MAX;
@@ -28,7 +28,7 @@ void pedal2numpad::process(struct mg_ev ev, virtual_device* out) {
       out_ev.code = i < numericKeysSize ? NUMERIC_KEYS[i] : STOP_KEY;
       out_ev.value = isKeyPubCycle && (pressedIndex == i);
 
-      //std::cout << "code" << "|" << i << "|" << out_ev.code << "|" << out_ev.value << "|" << std::endl;
+      // std::cout << "code" << "|" << i << "|" << out_ev.code << "|" << out_ev.value << "|" << std::endl;
 
       if (out_ev.value != val_caches[i]) {
         write_out(out_ev, virt_keyboard);
