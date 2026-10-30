@@ -12,6 +12,10 @@
 class input_source;
 class slot_manager;
 
+struct virt_dev_listener {
+  virtual void on_virt_dev_event(const struct input_event& in) = 0;
+  virtual ~virt_dev_listener() = default;
+};
 
 class virtual_device : public std::enable_shared_from_this<virtual_device> {
 public:
@@ -20,8 +24,11 @@ public:
   virtual_device(std::string name, slot_manager* slot_man) : name(name), slot_man(slot_man) { for (int i = 0; i < 16; i++) effects[i].id = -1; };
   virtual_device(std::string name, std::string descr, slot_manager* slot_man) : name(name), descr(descr), slot_man(slot_man) { for (int i = 0; i < 16; i++) effects[i].id = -1; };
   virtual ~virtual_device();
-  virtual void take_event(struct input_event in) {
-  }
+  virtual void take_event(struct input_event in);
+
+  void register_listener(virt_dev_listener* listener);
+  void unregister_listener(virt_dev_listener* listener);
+  void notify_listeners(const struct input_event& in);
 
   virtual void init() {
   }
@@ -56,6 +63,8 @@ protected:
   std::shared_ptr<virtual_device> self_ref_to_prevent_deletion_with_ff;
   std::mutex lock;
   std::mutex delayed_events_lock;
+  std::mutex listener_lock;
+  std::vector<virt_dev_listener*> listeners;
   bool device_opened = true;
   uinput* ui = nullptr;
   slot_manager* slot_man;
@@ -72,6 +81,7 @@ class debug_device : public virtual_device {
 public:
   debug_device(std::string name, std::string descr, slot_manager* slot_man) : virtual_device(name, descr, slot_man) {};
   virtual void take_event(struct input_event in) {
+    virtual_device::take_event(in);
     const char* event_name = nullptr;
     if (in.type == EV_KEY) event_name = get_key_name(in.code);
     if (in.type == EV_ABS) event_name = get_axis_name(in.code);

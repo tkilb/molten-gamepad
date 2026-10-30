@@ -27,6 +27,7 @@ static int dpad_hat_axis[4] = {ABS_HAT0Y, ABS_HAT0Y, ABS_HAT0X, ABS_HAT0X};
 static int dpad_hat_mult[4] = { -1,        1,         -1,        1        };
 
 void virtual_gamepad::take_event(struct input_event in) {
+  virtual_device::take_event(in);
 
   //translate DPAD buttons to hat events if needed.
   if (dpad_as_hat && in.type == EV_KEY && (in.code >= BTN_DPAD_UP && in.code <= BTN_DPAD_RIGHT)) {

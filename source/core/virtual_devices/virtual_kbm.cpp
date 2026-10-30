@@ -18,6 +18,7 @@ virtual_keyboard::~virtual_keyboard() {
 }
 
 void virtual_keyboard::take_event(struct input_event in) {
+  virtual_device::take_event(in);
   //Relative events go to a separate mouse device.
   //SYN events should go to both!
   if (in.type == EV_REL || in.type == EV_SYN) {

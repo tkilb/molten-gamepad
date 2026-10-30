@@ -28,6 +28,7 @@ void virtual_wheel::destroy_uinput_devs() {
 }
 
 void virtual_wheel::take_event(struct input_event in) {
+  virtual_device::take_event(in);
   if (uinput_fd >= 0) {
     write(uinput_fd, &in, sizeof(in));
   }

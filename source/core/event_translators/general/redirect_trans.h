@@ -23,6 +23,14 @@ public:
     return new redirect_trans(trans, redirected);
   }
 
+  virtual int get_out_button() const override {
+    return trans ? trans->get_out_button() : -1;
+  }
+  virtual virtual_device* get_target_device(virtual_device* default_out) const override {
+    auto redirected_strong = redirected.lock();
+    return redirected_strong ? redirected_strong.get() : default_out;
+  }
+
   static const char* decl;
   redirect_trans(std::vector<MGField>& fields);
   virtual void fill_def(MGTransDef& def);

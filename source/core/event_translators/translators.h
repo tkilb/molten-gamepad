@@ -13,6 +13,7 @@
 
 #include "general/multitrans.h"
 #include "general/redirect_trans.h"
+#include "general/toggle_trans.h"
 
 #include "group/simple_chord.h"
 #include "group/exclusive_chord.h"

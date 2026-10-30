@@ -13,6 +13,10 @@ public:
     return new btn2btn(*this);
   }
 
+  virtual int get_out_button() const override {
+    return out_button;
+  }
+
   static const char* decl;
   btn2btn(std::vector<MGField>& fields);
   virtual void fill_def(MGTransDef& def);

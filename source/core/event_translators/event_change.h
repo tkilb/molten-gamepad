@@ -65,6 +65,9 @@ public:
   //Do we want the input_source to send recurring "ticks" for processing?
   virtual bool wants_recurring_events() { return false; };
 
+  virtual int get_out_button() const { return -1; }
+  virtual virtual_device* get_target_device(virtual_device* default_out) const { return default_out; }
+
 
   virtual ~event_translator() {};
 

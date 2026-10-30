@@ -129,3 +129,54 @@ The driver is correctly mapping the physical events to the defined labels, and `
 3. **Persist FFB Fix**: If the "command queue flooded" issue recurs, consider a udev rule or script to automatically reload the driver on connection if necessary (though usually, a one-time fix is enough unless the device is disconnected).
 
 ---
+
+## Session: 2026-10-30 - Autorun Toggle Feature Implementation
+
+### Agent
+Senior Game Controller Engineer AI Agent
+
+### Objectives
+- [x] Design toggle event translator with cross-input auto-clear support
+- [x] Add virtual device listener interface to observe dispatched key events
+- [x] Implement `toggle_trans` translator supporting `toggle(...)`
+- [x] Register `toggle` translator in parser
+- [x] Compile and verify MoltenGamepad build
+- [x] Configure Gray Zone Warfare profile with t4 = toggle(key(key_w))
+
+### Progress Made
+- [x] **Virtual Device Event Observation**:
+  - Added `virt_dev_listener` interface in `virtual_device.h`
+  - Added thread-safe listener registration and dispatch in `virtual_device.cpp`
+  - Forwarded events to base `virtual_device::take_event(in)` in `virtual_kbm`, `virtual_gamepad`, `virtual_joystick`, `virtual_wheel`
+- [x] **Polymorphic Event Helpers**:
+  - Added `get_out_button()` and `get_target_device()` to `event_translator` base
+  - Overridden in `btn2btn`, `redirect_trans`, and `toggle_trans`
+- [x] **Toggle Translator**:
+  - Created `source/core/event_translators/general/toggle_trans.h` and `.cpp`
+  - Latching toggle logic: holds key down on first press, unlatches on second press
+  - Auto-clears toggle state if any external input emits the target key (e.g. 'W') to the virtual device
+  - Registered `toggle` translator in `source/core/parser.cpp`
+
+### Files Modified
+- `source/core/virtual_devices/virtual_device.h`
+- `source/core/virtual_devices/virtual_device.cpp`
+- `source/core/virtual_devices/virtual_kbm.cpp`
+- `source/core/virtual_devices/virtual_gamepad.cpp`
+- `source/core/virtual_devices/virtual_joystick.cpp`
+- `source/core/virtual_devices/virtual_wheel.cpp`
+- `source/core/event_translators/event_change.h`
+- `source/core/event_translators/button/btn2btn.h`
+- `source/core/event_translators/general/redirect_trans.h`
+- `source/core/event_translators/general/toggle_trans.h` (created)
+- `source/core/event_translators/general/toggle_trans.cpp` (created)
+- `source/core/event_translators/translators.h`
+- `source/core/parser.cpp`
+- `AGENT_LOG.md`
+
+### Current State
+- `toggle(...)` translator fully implemented and compiled into `moltengamepad`.
+- Binary deployed to `~/bin/moltengamepad`.
+- Verified working in-game with Gray Zone Warfare profile on `cyborg.t4 = toggle(key(key_w))`.
+- Latch state properly toggles on/off and automatically clears when external 'w' keystrokes are received.
+
+

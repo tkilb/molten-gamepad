@@ -7,6 +7,43 @@
 virtual_device::~virtual_device() {
   // close_virt_device() must be called in derived classes! Unavailble within base.
   // also, the base class has no actual virt devices to close...
+  std::lock_guard<std::mutex> guard(listener_lock);
+  listeners.clear();
+}
+
+void virtual_device::take_event(struct input_event in) {
+  notify_listeners(in);
+}
+
+void virtual_device::register_listener(virt_dev_listener* listener) {
+  if (!listener) return;
+  std::lock_guard<std::mutex> guard(listener_lock);
+  for (auto l : listeners) {
+    if (l == listener) return;
+  }
+  listeners.push_back(listener);
+}
+
+void virtual_device::unregister_listener(virt_dev_listener* listener) {
+  if (!listener) return;
+  std::lock_guard<std::mutex> guard(listener_lock);
+  for (auto it = listeners.begin(); it != listeners.end(); ++it) {
+    if (*it == listener) {
+      listeners.erase(it);
+      return;
+    }
+  }
+}
+
+void virtual_device::notify_listeners(const struct input_event& in) {
+  std::vector<virt_dev_listener*> local_listeners;
+  {
+    std::lock_guard<std::mutex> guard(listener_lock);
+    local_listeners = listeners;
+  }
+  for (auto l : local_listeners) {
+    l->on_virt_dev_event(in);
+  }
 }
 
 bool virtual_device::remove_device(input_source* dev) {

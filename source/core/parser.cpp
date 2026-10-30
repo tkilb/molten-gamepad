@@ -301,6 +301,13 @@ void MGparser::load_translators(moltengamepad* mg) {
   MAKE_GEN(pedal2numpad);
   RENAME_GEN(redirect,redirect_trans);
   RENAME_GEN(multi,multitrans);
+  //add toggle translator
+  trans_decl toggle_decl = build_trans_decl(toggle_trans::decl);
+  trans_gens["toggle"] = trans_generator(toggle_decl, [mg] (std::vector<MGField>& fields) {
+    auto t = new toggle_trans(fields);
+    t->virt_keyboard = mg->slots->keyboard.virt_dev.get();
+    return t;
+  });
   //add a quick mouse redirect
   trans_decl mouse_decl;
   mouse_decl.identifier = "mouse";
